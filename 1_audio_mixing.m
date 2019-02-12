@@ -88,6 +88,21 @@ subplot(414); plot(h14(1:200), 'LineWidth', 1.5); title('h14', 'FontSize', 14);
 
 save('RIR_s1.mat', 'h11', 'h12', 'h13', 'h14');
 
+% estimate ground truth time-delay difference & log(attenuation ratio) from time-domain IRs
+% reference mic = 1
+[v11, i11] = max(h11);
+[v12, i12] = max(h12);
+[v13, i13] = max(h13);
+[v14, i14] = max(h14);
+
+disp(['log(a2/a1) = ' num2str(log(v12/v11))]);
+disp(['log(a3/a1) = ' num2str(log(v13/v11))]);
+disp(['log(a4/a1) = ' num2str(log(v14/v11))]);
+
+disp(['tau2-tau1 = ' num2str((i12-i11)/fs) ' (s)']);
+disp(['tau3-tau1 = ' num2str((i13-i11)/fs) ' (s)']);
+disp(['tau4-tau1 = ' num2str((i14-i11)/fs) ' (s)']);
+
 y11 = fftfilt(h11, x1);
 y12 = fftfilt(h12, x1);
 y13 = fftfilt(h13, x1);
