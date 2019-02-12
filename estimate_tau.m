@@ -7,7 +7,7 @@ tList = ceil(T * (0.05:0.05:0.95));
 pairID = 1;
 args.meth = 'matlab'; % unwrap method
 args.tol = pi;
-num_top = 1; % number of tallest bins to consider when estimating slope within a frame
+num_top = 10; % number of tallest bins to consider when estimating slope within a frame
 
 estimateList = zeros(size(tList));
 confidenceList = zeros(size(tList));

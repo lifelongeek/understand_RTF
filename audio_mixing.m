@@ -45,7 +45,7 @@ mean_dist = mean(distance, 2);
 std_dist = std(distance, 0, 2);
 
 
-% visualize spatial distribution
+% visuali   ze spatial distribution
 figure;
 scatter3(mic_xyz(:, 1), mic_xyz(:, 2), mic_xyz(:, 3), 'filled');
 hold on;
@@ -54,7 +54,7 @@ scatter3(src_xyz(2, 1), src_xyz(2, 2), src_xyz(2, 3), 'filled');
 scatter3(center(1), center(2), center(3), 'x');
 axis([0, room(1), 0, room(2), 0, room(3)]);
 
-
+   
 
 mylg = legend('mic', ['src (d = ' num2str(mean_dist(1)) 'm)'], ['src (d = ' num2str(mean_dist(2)) 'm)']);
 mylg.FontSize = 14;

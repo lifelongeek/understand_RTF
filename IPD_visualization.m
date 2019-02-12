@@ -1,28 +1,38 @@
-
 clear all; clc; close all;
-
+%% hyperparameters
+args.tol = pi;  % tolerance threshold for unwrapping
+args.meth = 'matlab'; % matlab - matlab function; running_slope - experimental
+args.mThr = 3e-5;
 %% case 1) #src = 1, #mic = 4, RT60 = 0
-
-figure(1); % t = {30%, 60%}, method = {'wrap', 'unwrap'}, micpair = {close, distant}, window = {'20ms', '500ms'}
+f1 = figure(1); % t = {30%, 60%}, method = {'wrap', 'unwrap'}, micpair = {close, distant}, window = {'20ms', '500ms'}
 load('stft/case1_ppd_20ms_wrap_mod.mat');
+load('stft/case1_mag_20ms.mat');
+args.magn = mag; 
 
 T = size(ppd_wrap_mod, 3);
 F = size(ppd_wrap_mod, 2);
 Flist = [1, ceil(F*0.25), ceil(F*0.5), ceil(F*0.75), F];
 Flabels = {'0', '2000', '4000', '6000', '8000'};
-T30 = ceil(T*0.3);
+
+T30 = ceil(T*0.35);
 T60 = ceil(T*0.6);
 
 h1 = subplot(441); plot(ppd_wrap_mod(1, :, T30), 'k', 'Linewidth', 2);  title('T = 30%', 'FontSize', 12); ylabel('close', 'FontSize', 14); xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 30%, unwrap, 20ms, close
 h2 = subplot(442); plot(ppd_wrap_mod(1, :, T60), 'k', 'Linewidth', 2);  title('T = 60%', 'FontSize', 12); xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 60%, unwrap, 20ms, close
-h3 = subplot(443); plot(unwrap(ppd_wrap_mod(1, :, T30)), 'k', 'Linewidth', 2);  title('T = 30%', 'FontSize', 12); xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 30%, wrap, 20ms, close
-h4 = subplot(444); plot(unwrap(ppd_wrap_mod(1, :, T60)), 'k', 'Linewidth', 2);  title('T = 60%', 'FontSize', 12); xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 60%, wrap, 20ms, close
+args.pair = [1 2]; args.time = T30;
+h3 = subplot(443); plot(myunwrap(ppd_wrap_mod(1, :, T30), args), 'k', 'Linewidth', 2);  title('T = 30%', 'FontSize', 12); xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 30%, wrap, 20ms, close
+args.time = T60;
+h4 = subplot(444); plot(myunwrap(ppd_wrap_mod(1, :, T60), args), 'k', 'Linewidth', 2);  title('T = 60%', 'FontSize', 12); xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 60%, wrap, 20ms, close
 h5 = subplot(445); plot(ppd_wrap_mod(3, :, T30), 'k', 'Linewidth', 2);  ylabel('distant', 'FontSize', 14); xticks(Flist); xticklabels(Flabels); xlim([1, F]);% 30%, unwrap, 20ms, distant
 h6 = subplot(446); plot(ppd_wrap_mod(3, :, T60), 'k', 'Linewidth', 2);  xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 60%, unwrap, 20ms, distant
-h7 = subplot(447); plot(unwrap(ppd_wrap_mod(3, :, T30)), 'k', 'Linewidth', 2);  xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 30%, wrap, 20ms, distant
-h8 = subplot(448); plot(unwrap(ppd_wrap_mod(3, :, T60)), 'k', 'Linewidth', 2);  xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 60%, wrap, 20ms, distant
+args.pair = [1 4]; args.time = T30;
+h7 = subplot(447); plot(myunwrap(ppd_wrap_mod(3, :, T30), args), 'k', 'Linewidth', 2);  xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 30%, wrap, 20ms, distant
+args.time = T60;
+h8 = subplot(448); plot(myunwrap(ppd_wrap_mod(3, :, T60), args), 'k', 'Linewidth', 2);  xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 60%, wrap, 20ms, distant
 
 load('stft/case1_ppd_500ms_wrap_mod.mat');
+load('stft/case1_mag_500ms.mat');
+args.magn = mag;
 
 T = size(ppd_wrap_mod, 3);
 F = size(ppd_wrap_mod, 2);
@@ -32,12 +42,17 @@ T60 = ceil(T*0.6);
 
 h9 = subplot(4,4,9); plot(ppd_wrap_mod(1, :, T30), 'k', 'Linewidth', 1.5);  ylabel('close', 'FontSize', 14);  xticks(Flist); xticklabels(Flabels); xlim([1, F]);% 30%, unwrap, 500ms, close
 h10 = subplot(4,4,10); plot(ppd_wrap_mod(1, :, T60), 'k', 'Linewidth', 1.5);  xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 60%, unwrap, 500ms, close
-h11 = subplot(4,4,11); plot(unwrap(ppd_wrap_mod(1, :, T30)), 'k', 'Linewidth', 1.5);  xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 30%, wrap, 500ms, close
-h12 = subplot(4,4,12); plot(unwrap(ppd_wrap_mod(1, :, T60)), 'k', 'Linewidth', 1.5);  xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 60%, wrap, 500ms, close
+args.pair = [1 2]; args.time = T30;
+h11 = subplot(4,4,11); plot(myunwrap(ppd_wrap_mod(1, :, T30), args), 'k', 'Linewidth', 1.5);  xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 30%, wrap, 500ms, close
+args.time = T60;
+h12 = subplot(4,4,12); plot(myunwrap(ppd_wrap_mod(1, :, T60), args), 'k', 'Linewidth', 1.5);  xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 60%, wrap, 500ms, close
 h13 = subplot(4,4,13); plot(ppd_wrap_mod(3, :, T30), 'k', 'Linewidth', 1.5);  ylabel('distant', 'FontSize', 14); xticks(Flist); xticklabels(Flabels); xlim([1, F]); xlabel('Frequency (Hz)', 'FontSize', 12);  % 30%, unwrap, 500ms, distant
 h14 = subplot(4,4,14); plot(ppd_wrap_mod(3, :, T60), 'k', 'Linewidth', 1.5);  xticks(Flist); xticklabels(Flabels); xlim([1, F]); xlabel('Frequency (Hz)', 'FontSize', 12); % 60%, unwrap, 500ms, distant
-h15 = subplot(4,4,15); plot(unwrap(ppd_wrap_mod(3, :, T30)), 'k', 'Linewidth', 1.5); xticks(Flist); xticklabels(Flabels); xlim([1, F]); xlabel('Frequency (Hz)', 'FontSize', 12);  % 30%, wrap, 500ms, distant
-h16 = subplot(4,4,16); plot(unwrap(ppd_wrap_mod(3, :, T60)), 'k', 'Linewidth', 1.5);  xticks(Flist); xticklabels(Flabels); xlim([1, F]);  xlabel('Frequency (Hz)', 'FontSize', 12);  % 60%, wrap, 500ms, distant
+args.pair = [1 4];
+args.time = T30;
+h15 = subplot(4,4,15); plot(myunwrap(ppd_wrap_mod(3, :, T30), args), 'k', 'Linewidth', 1.5); xticks(Flist); xticklabels(Flabels); xlim([1, F]); xlabel('Frequency (Hz)', 'FontSize', 12);  % 30%, wrap, 500ms, distant
+args.time = T60;
+h16 = subplot(4,4,16); plot(myunwrap(ppd_wrap_mod(3, :, T60), args), 'k', 'Linewidth', 1.5);  xticks(Flist); xticklabels(Flabels); xlim([1, F]);  xlabel('Frequency (Hz)', 'FontSize', 12);  % 60%, wrap, 500ms, distant
 
 p1 = get(h1, 'position');
 p2 = get(h2, 'position');
@@ -66,52 +81,57 @@ h913 = axes('position', [p13(1)*0.7 p13(2) p13(3) height], 'visible', 'off');
 ylabel('500ms', 'FontSize', 14, 'visible', 'on'); 
 
 
-%% case 3) #src = 2, #mic = 4, RT60 = 0
-load('stft/case1_ppd_20ms_wrap_mod.mat');
-ppd_s1 = ppd_wrap_mod;
-load('stft/case3_s2_ppd_20ms_wrap_mod.mat');
-ppd_s2 = ppd_wrap_mod;
-load('stft/case3_mix_ppd_20ms_wrap_mod.mat');
-ppd_mix = ppd_wrap_mod;
-
-T = size(ppd_mix, 3);
-F = size(ppd_mix, 2);
-Flist = [1, ceil(F*0.25), ceil(F*0.5), ceil(F*0.75), F];
-Flabels = {'0', '2000', '4000', '6000', '8000'};
-T30 = ceil(T*0.3);
-T60 = ceil(T*0.6);
+[status, msg] = mkdir('figures'); % status and msg are also needed for not seeing warnings if folder already exists
+assert(status, strcat('something went wrong when creating a folder. Error message: ', msg))
+saveas(f1, fullfile('figures', strcat('unwrap_',args.meth, '.jpg')));
 
 
-figure(2);  % close mic pair
-subplot(321); plot(ppd_s1(1, :, T30), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); title('Pi-Pj', 'FontSize', 16); ylabel('source1', 'FontSize', 16);
-subplot(322); plot(unwrap(ppd_s1(1, :, T30)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); title('U(Pi-Pj)', 'FontSize', 16); 
-subplot(323); plot(ppd_s2(1, :, T30), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('source2', 'FontSize', 16);
-subplot(324); plot(unwrap(ppd_s2(1, :, T30)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
-subplot(325); plot(ppd_mix(1, :, T30), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('mixture', 'FontSize', 16);
-subplot(326); plot(unwrap(ppd_mix(1, :, T30)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
-
-
-figure(3); % distant mic pair
-subplot(321); plot(ppd_s1(3, :, T30), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); title('Pi-Pj', 'FontSize', 16); ylabel('source1', 'FontSize', 16);
-subplot(322); plot(unwrap(ppd_s1(3, :, T30)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); title('U(Pi-Pj)', 'FontSize', 16); 
-subplot(323); plot(ppd_s2(3, :, T30), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('source2', 'FontSize', 16);
-subplot(324); plot(unwrap(ppd_s2(3, :, T30)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
-subplot(325); plot(ppd_mix(3, :, T30), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('mixture', 'FontSize', 16);
-subplot(326); plot(unwrap(ppd_mix(3, :, T30)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
-
-
-Ts1_s2max = 873;
-Ts1_s2min = 1080;
-
-figure(4); 
-subplot(421); plot(ppd_s1(1, :, Ts1_s2max), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); title('Pi-Pj', 'FontSize', 16); ylabel('source1', 'FontSize', 14);
-subplot(422); plot(unwrap(ppd_s1(1, :, Ts1_s2max)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); title('U(Pi-Pj)', 'FontSize', 16); 
-subplot(423); plot(ppd_s2(1, :, Ts1_s2min), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('source2', 'FontSize', 14);
-subplot(424); plot(unwrap(ppd_s2(1, :, Ts1_s2min)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
-subplot(425); plot(ppd_mix(1, :, Ts1_s2max), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('mix (t=s1/s2 max)', 'FontSize', 14);
-subplot(426); plot(unwrap(ppd_mix(1, :, Ts1_s2max)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
-subplot(427); plot(ppd_mix(1, :, Ts1_s2min), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('mix (t=s1/s2 min)', 'FontSize', 14);
-subplot(428); plot(unwrap(-ppd_mix(1, :, Ts1_s2min)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
-
-
-
+% %% case 3) #src = 2, #mic = 4, RT60 = 0
+% load('stft/case1_ppd_20ms_wrap_mod.mat');
+% ppd_s1 = ppd_wrap_mod;
+% load('stft/case3_s2_ppd_20ms_wrap_mod.mat');
+% ppd_s2 = ppd_wrap_mod;
+% load('stft/case3_mix_ppd_20ms_wrap_mod.mat');
+% ppd_mix = ppd_wrap_mod;
+% 
+% T = size(ppd_mix, 3);
+% F = size(ppd_mix, 2);
+% Flist = [1, ceil(F*0.25), ceil(F*0.5), ceil(F*0.75), F];
+% Flabels = {'0', '2000', '4000', '6000', '8000'};
+% T30 = ceil(T*0.3);
+% T60 = ceil(T*0.6);
+% 
+% 
+% figure(2);  % close mic pair
+% subplot(321); plot(ppd_s1(1, :, T30), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); title('Pi-Pj', 'FontSize', 16); ylabel('source1', 'FontSize', 16);
+% subplot(322); plot(unwrap(ppd_s1(1, :, T30)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); title('U(Pi-Pj)', 'FontSize', 16); 
+% subplot(323); plot(ppd_s2(1, :, T30), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('source2', 'FontSize', 16);
+% subplot(324); plot(unwrap(ppd_s2(1, :, T30)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
+% subplot(325); plot(ppd_mix(1, :, T30), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('mixture', 'FontSize', 16);
+% subplot(326); plot(unwrap(ppd_mix(1, :, T30)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
+% 
+% 
+% figure(3); % distant mic pair
+% subplot(321); plot(ppd_s1(3, :, T30), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); title('Pi-Pj', 'FontSize', 16); ylabel('source1', 'FontSize', 16);
+% subplot(322); plot(unwrap(ppd_s1(3, :, T30)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); title('U(Pi-Pj)', 'FontSize', 16); 
+% subplot(323); plot(ppd_s2(3, :, T30), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('source2', 'FontSize', 16);
+% subplot(324); plot(unwrap(ppd_s2(3, :, T30)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
+% subplot(325); plot(ppd_mix(3, :, T30), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('mixture', 'FontSize', 16);
+% subplot(326); plot(unwrap(ppd_mix(3, :, T30)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
+% 
+% 
+% Ts1_s2max = 873;
+% Ts1_s2min = 1080;
+% 
+% figure(4); 
+% subplot(421); plot(ppd_s1(1, :, Ts1_s2max), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); title('Pi-Pj', 'FontSize', 16); ylabel('source1', 'FontSize', 14);
+% subplot(422); plot(unwrap(ppd_s1(1, :, Ts1_s2max)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); title('U(Pi-Pj)', 'FontSize', 16); 
+% subplot(423); plot(ppd_s2(1, :, Ts1_s2min), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('source2', 'FontSize', 14);
+% subplot(424); plot(unwrap(ppd_s2(1, :, Ts1_s2min)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
+% subplot(425); plot(ppd_mix(1, :, Ts1_s2max), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('mix (t=s1/s2 max)', 'FontSize', 14);
+% subplot(426); plot(unwrap(ppd_mix(1, :, Ts1_s2max)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
+% subplot(427); plot(ppd_mix(1, :, Ts1_s2min), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]); ylabel('mix (t=s1/s2 min)', 'FontSize', 14);
+% subplot(428); plot(unwrap(-ppd_mix(1, :, Ts1_s2min)), 'k', 'LineWidth', 2); xticks(Flist); xticklabels(Flabels); xlim([1, F]);
+% 
+% 
+% 
