@@ -1,0 +1,33 @@
+pair) result
+
+ground truth:
+21) tau2-tau1 = -0.0005 (s);    log(a2/a1) = -0.016589
+31) tau3-tau1 = -0.0010625 (s); log(a3/a1) = 0.26961
+41) tau4-tau1 = -0.0016875 (s); log(a4/a1) = 0.46255
+
+
+simple mean for tau, masked mean for pmd (Mi>thr and Mj>thr), thr=1e-6
+21) tau difference estimate: 0.0005s, pmd estimate: 0.1075
+31) tau difference estimate: 0.001062s, pmd estimate: 0.2529
+41) tau difference estimate: 0.001687s, pmd estimate: 0.4035
+
+simple mean
+21) tau difference estimate: 0.0005s, pmd estimate: 0.01946
+31) tau difference estimate: 0.001062s, pmd estimate: 0.07896
+41) tau difference estimate: 0.001687s, pmd estimate: 0.1109
+
+trimmed mean (lowest 5% and highest 5% are ignored)
+21) tau difference estimate: 0.0004978s, pmd estimate: 0.01904
+31) tau difference estimate: 0.001046s, pmd estimate: 0.0725
+41) tau difference estimate: 0.001676s, pmd estimate: 0.1064
+
+trimmed mean (lowest 10% and highest 10% are ignored)
+21) tau difference estimate: 0.0004809s, pmd estimate: 0.02086
+31) tau difference estimate: 0.00103s, pmd estimate: 0.06756
+41) tau difference estimate: 0.001642s, pmd estimate: 0.1032
+
+
+top 10 bins average, bin width = 0.05
+21) tau difference estimate: 0.0005022s, pmd estimate: 0.01296
+31) tau difference estimate: 0.0007967s, pmd estimate: 0.06636
+41) tau difference estimate: 0.001275s, pmd estimate: 0.09716

@@ -5,26 +5,40 @@ import scipy.io as sio
 import matplotlib.pyplot as plt
 from scipy import stats
 
-
 def intermic_mag_diff(input):
     # input : torch tensor of shape (num batches, F, nCH, T) for fft magnitude
     # output : torch tensor for log(Mi/M0), for i = ids of mics other than 0th
     eps = 1e-8
+    mag_thr = 1e-6
     minval = math.log(eps)
     maxval = 10000
 
     N, F, nCH, T = input.size()
     nCombination = nCH-1  # assume that reference mic appear at the first of dim
 
-    output = torch.FloatTensor(N, F, nCombination, T).zero_()
+    # output = torch.FloatTensor(N, F, nCombination, T).zero_()
+    PMD = torch.FloatTensor(N, nCombination, T).zero_()
 
+    mask = (input[:, :, 0, :] > mag_thr)  # NxFxT
+    mask = mask.float()
+    unmasked_freq_count = torch.sum(mask, dim=1)  # NxT
     for i in range(nCH-1):
-        output[:, :, i, :] = input[:, :, i+1, :]/(input[:, :, 0, :] + eps)
+        pmd_masked = mask*input[:, :, i+1, :]/(input[:, :, 0, :] + eps)  # NxFxT
+        pmd_masked_mean = torch.sum(pmd_masked, dim=1)/unmasked_freq_count  # NxT
+        # pmd_masked_var = torch.sum(mask*(pmd_masked-pmd_masked_mean.expand_as(pmd_masked))**2, dim=1)/unmasked_freq_count
+        # confidence = 1/pmd_masked_var  # NxT
 
-    output = torch.log(output+eps)
-    output = torch.clamp(output, min=minval, max=maxval)
+        # indices = torch.argmax(confidence, dim=1)  # N
+        PMD[:, i, :] = pmd_masked_mean
+        # output[:, :, i, :] = input[:, :, i+1, :]/(input[:, :, 0, :] + eps)
 
-    return output
+    PMD = torch.log(PMD+eps)
+    PMD = torch.clamp(PMD, min=minval, max=maxval)
+    # output = torch.log(output+eps)
+    # output = torch.clamp(output, min=minval, max=maxval)
+
+    # return output
+    return PMD
 
 
 def intermic_phs_diff(input):
@@ -64,7 +78,7 @@ def frame_value_estimate(v, num_top=10, binWidth=0.05):
     for i in range(num_top):
         mask = v_bin_indices == sorted_bins[i]
         binSize = mask.sum()
-        binMean = np.mean(v*mask)
+        binMean = np.sum(v*mask)/binSize
         binSizeList[i] = binSize
         binMeanList[i] = binMean
 
@@ -86,8 +100,8 @@ def estimate_value(V, pair_id, name, num_top_bins=10, binWidth=0.05):
         Vframe = V[0, :, pair_id, t]  # unwrapped frame
         # diff_uwframe = np.diff(uwframe)
         # estimateList[i] = frame_value_estimate(Vframe, num_top_bins)
-        # estimateList[i] = np.mean(Vframe)
-        estimateList[i] = stats.trim_mean(Vframe, proportiontocut=0.05)
+        estimateList[i] = np.mean(Vframe)
+        # estimateList[i] = stats.trim_mean(Vframe, proportiontocut=0.2)
         confidenceList[i] = 1/np.std(Vframe)
     slope_estimate = estimateList[np.argmax(confidenceList)]
 
@@ -125,15 +139,15 @@ if __name__ == '__main__':
     ppd = ppd.numpy()
 
     pair_id = 2  # 0..2
-    _, F, _, T = np.shape(pmd)
+    _, F, _, T = np.shape(ppd)
     t_relative = 0.35
     t = math.ceil(T*t_relative)
 
     plt.close('all')
 
-    plt.figure()
-    plt.plot(pmd[0, :, pair_id, t])
-    plt.title('PMD at {}T'.format(t_relative))
+    # plt.figure()
+    # plt.plot(pmd[0, :, pair_id, t])
+    # plt.title('PMD at {}T'.format(t_relative))
 
     plt.figure()
     plt.plot(ppd[0, :, pair_id, t])
@@ -142,10 +156,11 @@ if __name__ == '__main__':
     plt.show()
 
     # ppd estimation
-    bin_width = 0.05  # might be unused
-    num_top_bins = 10  # number of tallest bins to consider when estimating slope within a frame - might be unused
     diff_ppd = np.diff(ppd, axis=1)
-    slope_estimate = estimate_value(diff_ppd, pair_id, 'slope', num_top_bins, bin_width)
-    pmd_estimate = estimate_value(pmd, pair_id, 'pmd', num_top_bins, bin_width)
-    print('slope estimate: {:.4f}, pmd estimate: {:.4f}'.format(slope_estimate, pmd_estimate))
+    slope_estimate = estimate_value(diff_ppd, pair_id, 'slope')
+    # pmd_estimate = estimate_value(pmd, pair_id, 'pmd')
+    pmd_estimate = pmd
+    tau_difference_estimate = slope_estimate/(2*math.pi*8000/160)
+    print('tau difference estimate: {:.4g}s, pmd estimate: {:.4g}'.
+          format(tau_difference_estimate, pmd_estimate[0, pair_id, t]))
     # implement pmd estimation
