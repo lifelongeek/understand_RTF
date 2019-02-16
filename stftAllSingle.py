@@ -28,6 +28,11 @@ def singleSrcSTFT(m1_path, m2_path):
 
 
 if __name__ == '__main__':
-    m1_path = 'audio/mic/84-121123-0000_m1.wav'
-    m2_path = 'audio/mic/84-121123-0000_m2.wav'
-    singleSrcSTFT(m1_path, m2_path)
+    src_dir = 'audio/source'
+    mic_dir = 'audio/mic'
+    for filename in os.listdir(src_dir):
+        if filename.endswith(".wav"):
+            mix_id = filename[:-4]
+            m1_path = os.path.join(mic_dir, '{}_m1.wav'.format(mix_id))
+            m2_path = os.path.join(mic_dir, '{}_m2.wav'.format(mix_id))
+            singleSrcSTFT(m1_path, m2_path)

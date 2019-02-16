@@ -46,7 +46,7 @@ def intermic_mag_diff(stft_magn):
 
 def intermic_phs_diff(stft_phs):
     # input: torch tensor of shape (num batches, F, nCH, T) for stft phase
-    # output: torch tensor for unwrapped phase differences
+    # output: torch tensor for unwrapped phase differences, shape: (N, F, nCombination, T)
     PI = math.pi
     TWOPI = PI*2
     N, F, nCH, T = stft_phs.size()
@@ -65,7 +65,7 @@ def intermic_phs_diff(stft_phs):
     ipd = np.unwrap(ipd, axis=1)
     ipd = torch.FloatTensor(ipd)
 
-    return ipd
+    return ipd  # (N, F, nCombination, T)
 
 
 def intermic_tau_diff(stft_phs):
@@ -76,8 +76,8 @@ def intermic_tau_diff(stft_phs):
     diff_ipd = np.diff(ipd, axis=1)
     slope_estimates = np.mean(diff_ipd, 1)
     tau_diff_estimates = slope_estimates/(2*math.pi*8000/160)
-    tau_diff_confidences = 1/np.std(diff_ipd, 1)
-    return tau_diff_estimates, tau_diff_confidences
+    tau_diff_confidences = 1/(np.std(diff_ipd, 1) + 1e-8)
+    return tau_diff_estimates, tau_diff_confidences  # (num batches, nCombination, T)
 
 
 # def frame_value_estimate(v, num_top=10, binWidth=0.05):
@@ -179,18 +179,18 @@ if __name__ == '__main__':
     plt.title('Confidence(t) for pair {}-1'.format(pair_id+1))
     plt.tight_layout()
 
-    # plt.figure()
-    # plt.plot(ipd[0, :, pair_id, t])
-    # plt.title('IPD at {}T'.format(t_relative))
-
     plt.show()
 
-    # ipd estimation
-    # diff_ipd = np.diff(ipd_estimates, axis=1)
-    # slope_estimate = estimate_value(diff_ipd, pair_id, 'slope')
-    # imd_estimate = estimate_value(imd, pair_id, 'imd')
-    # imd_estimate = imd
-    tau_difference = tau_diff_estimates[0, pair_id, np.argmax(tau_diff_confidences[0,pair_id,:])]
-    imd_mean = np.mean(imd_estimates[0, pair_id, :])
-    print(('tau difference estimate: {:.4g}s, imd mean across T: {}').
-          format(tau_difference, imd_mean))
+    ## estimates for a single pair:
+    # tau_difference = tau_diff_estimates[0, pair_id, np.argmax(tau_diff_confidences[0,pair_id,:])]
+    # imd_mean = np.mean(imd_estimates[0, pair_id, :])
+    # print(('tau difference estimate: {:.4g}s, imd mean across T: {}').
+    #       format(tau_difference, imd_mean))
+
+    # estimates for all pairs
+    nPairs = np.shape(tau_diff_estimates)[1]
+    tau_differences = [tau_diff_estimates[0, p, np.argmax(tau_diff_confidences[0, p])]
+                       for p in range(nPairs)]
+    imd_means = np.mean(imd_estimates[0, :, :], axis=1)
+    print('estimated tau differences: {},\n' 
+          'estimated imds: {}'.format(tau_differences, imd_means))
