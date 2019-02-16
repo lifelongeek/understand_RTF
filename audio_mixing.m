@@ -45,7 +45,7 @@ mean_dist = mean(distance, 2);
 std_dist = std(distance, 0, 2);
 
 
-% visuali   ze spatial distribution
+% visualize spatial distribution
 figure;
 scatter3(mic_xyz(:, 1), mic_xyz(:, 2), mic_xyz(:, 3), 'filled');
 hold on;

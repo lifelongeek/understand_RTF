@@ -6,7 +6,7 @@ ground truth:
 41) tau4-tau1 = -0.0016875 (s); log(a4/a1) = 0.46255
 
 
-simple mean for tau, masked mean for pmd (Mi>thr and Mj>thr), thr=1e-6
+simple mean for tau, masked mean for pmd (M0>thr), thr=1e-6
 21) tau difference estimate: 0.0005s, pmd estimate: 0.1075
 31) tau difference estimate: 0.001062s, pmd estimate: 0.2529
 41) tau difference estimate: 0.001687s, pmd estimate: 0.4035
