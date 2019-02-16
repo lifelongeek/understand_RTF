@@ -160,12 +160,8 @@ if __name__ == '__main__':
 
     imd_estimates = imd_estimates.numpy()
     imd_confidences = imd_confidences.numpy()
-    # tau_diff_estimates = tau_diff_estimates.numpy()
-    # tau_diff_confidences = tau_diff_confidences.numpy()
-
 
     _, F, _, T = np.shape(mag)
-    # t = math.ceil(T*t_relative)
 
     plt.close('all')
 
