@@ -67,6 +67,9 @@ if __name__ == '__main__':
             print('imd_estimate: {:.5g}, imd_true: {:.5g}, imd_error: {:.5g}\n'.
                   format(imd_estimate, imd_true, imd_err))
 
+    print('avg abs tau diff error: {:.5g}, avg abs imd error: {:.5g}'.
+          format(np.mean(tau_diff_errors), np.mean(imd_errors)))
+
     plt.close('all')
     # plotting errors
     plt.figure()
