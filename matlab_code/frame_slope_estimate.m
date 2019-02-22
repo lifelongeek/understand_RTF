@@ -1,7 +1,7 @@
 function est = frame_slope_estimate(f, num_top)
 % finds mean of values in NUM_TOP bins that have highest number of elements
 if nargin == 0
-    load('stft/case1_ppd_20ms_wrap_mod.mat', 'ppd_wrap_mod');
+    load('../stft/case1_ppd_20ms_wrap_mod.mat', 'ppd_wrap_mod');
     T = size(ppd_wrap_mod,3);
     f = ppd_wrap_mod(1,:,ceil(T*0.3));
     num_top=10;

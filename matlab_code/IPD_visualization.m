@@ -1,12 +1,13 @@
 clear all; clc; close all;
 %% hyperparameters
 args.tol = pi;  % tolerance threshold for unwrapping
-args.meth = 'matlab'; % matlab - matlab function; running_slope - experimental
+args.meth = 'replica'; % matlab - matlab function; running_slope - experimental
 args.mThr = 3e-5;
+args.tau = 0.12;  % for NoiseRobust method
 %% case 1) #src = 1, #mic = 4, RT60 = 0
 f1 = figure(1); % t = {30%, 60%}, method = {'wrap', 'unwrap'}, micpair = {close, distant}, window = {'20ms', '500ms'}
-load('stft/case1_ppd_20ms_wrap_mod.mat');
-load('stft/case1_mag_20ms.mat');
+load('../stft/case1_ppd_20ms_wrap_mod.mat');
+load('../stft/case1_mag_20ms.mat');
 args.magn = mag; 
 
 T = size(ppd_wrap_mod, 3);
@@ -30,8 +31,8 @@ h7 = subplot(447); plot(myunwrap(ppd_wrap_mod(3, :, T30), args), 'k', 'Linewidth
 args.time = T60;
 h8 = subplot(448); plot(myunwrap(ppd_wrap_mod(3, :, T60), args), 'k', 'Linewidth', 2);  xticks(Flist); xticklabels(Flabels); xlim([1, F]); % 60%, wrap, 20ms, distant
 
-load('stft/case1_ppd_500ms_wrap_mod.mat');
-load('stft/case1_mag_500ms.mat');
+load('../stft/case1_ppd_500ms_wrap_mod.mat');
+load('../stft/case1_mag_500ms.mat');
 args.magn = mag;
 
 T = size(ppd_wrap_mod, 3);
@@ -81,17 +82,17 @@ h913 = axes('position', [p13(1)*0.7 p13(2) p13(3) height], 'visible', 'off');
 ylabel('500ms', 'FontSize', 14, 'visible', 'on'); 
 
 
-[status, msg] = mkdir('figures'); % status and msg are also needed for not seeing warnings if folder already exists
+[status, msg] = mkdir('../figures'); % status and msg are also needed for not seeing warnings if folder already exists
 assert(status, strcat('something went wrong when creating a folder. Error message: ', msg))
-saveas(f1, fullfile('figures', strcat('unwrap_',args.meth, '.jpg')));
+saveas(f1, fullfile('../figures', strcat('unwrap_',args.meth, '.jpg')));
 
 
 % %% case 3) #src = 2, #mic = 4, RT60 = 0
-% load('stft/case1_ppd_20ms_wrap_mod.mat');
+% load('../stft/case1_ppd_20ms_wrap_mod.mat');
 % ppd_s1 = ppd_wrap_mod;
-% load('stft/case3_s2_ppd_20ms_wrap_mod.mat');
+% load('../stft/case3_s2_ppd_20ms_wrap_mod.mat');
 % ppd_s2 = ppd_wrap_mod;
-% load('stft/case3_mix_ppd_20ms_wrap_mod.mat');
+% load('../stft/case3_mix_ppd_20ms_wrap_mod.mat');
 % ppd_mix = ppd_wrap_mod;
 % 
 % T = size(ppd_mix, 3);

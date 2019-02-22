@@ -1,6 +1,6 @@
-load('stft/case1_ppd_20ms_wrap_mod.mat', 'ppd_wrap_mod');
-% load('stft/case3_mix_ppd_20ms_wrap_mod.mat', 'ppd_wrap_mod');
-% load('stft/case1_mag_20ms.mat', 'mag');
+load('../stft/case1_ppd_20ms_wrap_mod.mat', 'ppd_wrap_mod');
+% load('../stft/case3_mix_ppd_20ms_wrap_mod.mat', 'ppd_wrap_mod');
+% load('../stft/case1_mag_20ms.mat', 'mag');
 % args.magn = mag;
 T = size(ppd_wrap_mod, 3);
 tList = ceil(T * (0.05:0.05:0.95));

@@ -136,16 +136,35 @@ def intermic_phs_diff(stft_phs, plot_enable=False):
         plt.savefig('figures/diff(IPD).png')
         plt.show()
 
+        plt.figure()
+        avg_unwrapped_ipd = np.mean(unwrapped_ipd, axis=3)  # N x F x nComb
+        plt.subplot(211)
+        plt.plot(avg_unwrapped_ipd[0,:,0])
+        plt.title('unwrapped ipd avg over time')
+        plt.tight_layout()
+
+        avg_wrapped_ipd = np.mean(wrapped_ipd, axis=3)
+        plt.subplot(212)
+        plt.plot(avg_wrapped_ipd[0,:,0])
+        plt.title('wrapped ipd avg over time')
+        plt.tight_layout()
+
+        plt.savefig('figures/avg_ipd.png')
+        plt.show()
+
     unwrapped_ipd = torch.FloatTensor(unwrapped_ipd)
     return unwrapped_ipd  # (N, F, nCombination, T)
 
 
-def intermic_tau_diff(stft_phs, plot_enable=False):
+def intermic_tau_diff_mean(stft_phs, plot_enable=False):
     # input: torch tensor of shape (num batches, F, nCH, T) for stft phase
     # output: torch tensor for tau differences, and corresponding confidences
     ipd = intermic_phs_diff(stft_phs, plot_enable=plot_enable)  # N, F, nComb, T
     ipd = ipd.numpy()
     diff_ipd = np.diff(ipd, axis=1)  # N, F, nComb, T
+    _, F, _, _ = diff_ipd.shape
+    # # try cutting off higher frequencies:
+    # diff_ipd = diff_ipd[:, 0:F//3, :, :]
     slope_estimates = np.mean(diff_ipd, 1)  # N, nComb, T
     tau_diff_estimates = slope_estimates/(2*math.pi*8000/160)   # N, nComb, T
     tau_diff_confidences = 1/(np.std(diff_ipd, 1) + 1e-8)   # N, nComb, T
@@ -155,7 +174,7 @@ def intermic_tau_diff(stft_phs, plot_enable=False):
         plt.close('all')
         plt.figure()
         plt.subplot(211)
-        plt.plot(ipd[0,:,0, np.argmax(tau_diff_confidences[0, 0, :])])
+        plt.plot(ipd[0, :, 0, np.argmax(tau_diff_confidences[0, 0, :])])
         plt.title('IPD at argmax(Confidence(t))')
 
         plt.subplot(212)
@@ -168,7 +187,61 @@ def intermic_tau_diff(stft_phs, plot_enable=False):
     return tau_diff_estimates, tau_diff_confidences  # (num batches, nCombination, T)
 
 
+def intermic_tau_diff_distribution_maxima(stft_phs, percent_top=50, binWidth=0.0001, plot_enable=False):
+    # inputs:
+    #   stft_phs: torch tensor of shape (num batches, F, nCH, T) for stft phase
+    #   percent_top: percent of top bins that would be taken mean of
+    #   binWidth: bin width for tau differences [in seconds]
+    # output: estimate of tau difference
+
+
+    ipd = intermic_phs_diff(stft_phs, plot_enable=plot_enable)  # N, F, nComb, T
+    ipd = ipd.numpy()
+    diff_ipd = np.diff(ipd, axis=1)  # N, F, nComb, T
+    N, F, nComb, T = diff_ipd.shape
+    diff_ipd = diff_ipd.transpose(0,2,1,3)  # N, nComb, F, T
+    # # try cutting off higher frequencies
+    # diff_ipd = diff_ipd[:, :, 0:F//2, :]
+
+    tau_diffs = diff_ipd/(2*math.pi*8000/160)  # convert slope values to tau differences
+
+    tau_estimates = np.zeros([N, nComb])
+
+    for n in range(N):
+        td_n = tau_diffs[n,:,:,:]
+        for c in range(nComb):
+            td_nc = td_n[c,:,:]  # F, T
+            v = td_nc.reshape(-1)  # F*T,
+            nbins = math.ceil((np.max(v) - np.min(v)) / binWidth)
+            hist, bin_edges = np.histogram(v, bins=nbins)
+            v_bin_indices = np.digitize(v, bin_edges) - 1  # -1 bcs np.digitize returns indices starting from 1
+            sorted_bins = np.flip(np.argsort(hist))  # bin numbers are sorted from tallest to shortest
+
+            num_top = np.int(np.ceil((percent_top*nbins)/100))
+            # num_top = 1
+            binSizeList = np.zeros(num_top)
+            binMeanList = np.zeros(num_top)
+            for i in range(num_top):
+                mask = (v_bin_indices == sorted_bins[i])
+                binSize = mask.sum()
+                binMean = np.sum(v * mask) / binSize
+                binSizeList[i] = binSize
+                binMeanList[i] = binMean
+
+            tau_estimates[n, c] = np.sum(binMeanList * binSizeList) / np.sum(binSizeList)
+            # histogram is plotted with NBINS bins
+            if plot_enable:
+                plt.close('all')
+                plt.figure()
+                plt.hist(v, nbins)
+                plt.savefig('figures/hist{}.png'.format(c + 1))
+                plt.show()
+
+    return tau_estimates  # (N, nComb)
+
+
 if __name__ == '__main__':
+    main_plot_enable = False
     pair_id = 0  # 0..2
     t_relative = 0.35
 
@@ -183,50 +256,59 @@ if __name__ == '__main__':
     mag = mag.permute(1, 0, 2).unsqueeze(0)
     phs = phs.permute(1, 0, 2).unsqueeze(0)
 
-    imd_estimates, imd_confidences = intermic_mag_diff(mag, plot_enable=True)
-    tau_diff_estimates, tau_diff_confidences = intermic_tau_diff(phs, plot_enable=True)
+    imd_estimates, imd_confidences = intermic_mag_diff(mag, plot_enable=False)
+    # tau_diff_estimates, tau_diff_confidences = intermic_tau_diff_mean(phs, plot_enable=True)
+    tau_diff_estimates = intermic_tau_diff_distribution_maxima(phs,
+                                                               percent_top=50,
+                                                               binWidth=0.0001,
+                                                               plot_enable=True)
 
     imd_estimates = imd_estimates.numpy()
     imd_confidences = imd_confidences.numpy()
 
     _, F, _, T = np.shape(mag)
 
-    plt.close('all')
-    # tau difference errors and confidences
-    plt.figure()
-    plt.subplot(211)
-    plt.plot(tau_diff_estimates[0, pair_id, :])
-    plt.title('tau difference for pair {}-1'.format(pair_id + 2))
-    plt.ylabel('delay difference [s]')
-    plt.tight_layout()
-    plt.subplot(212)
-    plt.plot(tau_diff_confidences[0, pair_id, :])
-    plt.title('tau confidence for pair {}-1'.format(pair_id + 2))
-    plt.xlabel('time frame')
-    plt.tight_layout()
-    plt.savefig('figures/TauDiffVsTime.png')
-    plt.show()
+    if main_plot_enable:
+        # plt.close('all')
+        ## tau difference errors and confidences
+        # plt.figure()
+        # plt.subplot(211)
+        # plt.plot(tau_diff_estimates[0, pair_id, :])
+        # plt.title('tau difference for pair {}-1'.format(pair_id + 2))
+        # plt.ylabel('delay difference [s]')
+        # plt.tight_layout()
+        # plt.subplot(212)
+        # plt.plot(tau_diff_confidences[0, pair_id, :])
+        # plt.title('tau confidence for pair {}-1'.format(pair_id + 2))
+        # plt.xlabel('time frame')
+        # plt.tight_layout()
+        # plt.savefig('figures/TauDiffVsTime.png')
+        # plt.show()
 
-    # IMD errors and confidences
-    plt.close('all')
-    plt.figure()
-    plt.subplot(211)
-    plt.plot(imd_estimates[0, pair_id, :])
-    plt.title('IMD for pair {}-1'.format(pair_id+2))
-    plt.tight_layout()
-    plt.subplot(212)
-    plt.plot(imd_confidences[0, pair_id, :])
-    plt.title('IMD confidence for pair {}-1'.format(pair_id+2))
-    plt.xlabel('time frame')
-    plt.tight_layout()
+        # IMD errors and confidences
+        plt.close('all')
+        plt.figure()
+        plt.subplot(211)
+        plt.plot(imd_estimates[0, pair_id, :])
+        plt.title('IMD for pair {}-1'.format(pair_id+2))
+        plt.tight_layout()
+        plt.subplot(212)
+        plt.plot(imd_confidences[0, pair_id, :])
+        plt.title('IMD confidence for pair {}-1'.format(pair_id+2))
+        plt.xlabel('time frame')
+        plt.tight_layout()
 
-    plt.savefig('figures/IMDvsTime.png')
-    plt.show()
+        plt.savefig('figures/IMDvsTime.png')
+        plt.show()
 
-    # estimates for all pairs
-    nPairs = np.shape(tau_diff_estimates)[1]
-    tau_differences = [tau_diff_estimates[0, p, np.argmax(tau_diff_confidences[0, p])]
-                       for p in range(nPairs)]
+    # # estimates for all pairs, in case of "mean with highest confidence":
+    # nPairs = np.shape(tau_diff_estimates)[1]
+    # tau_differences = [tau_diff_estimates[0, p, np.argmax(tau_diff_confidences[0, p])]
+    #                    for p in range(nPairs)]
+
+    # estimates for all pairs, in case of "mean of distribution maxima":
+    tau_differences = tau_diff_estimates
     imd_means = np.mean(imd_estimates[0, :, :], axis=1)
     print('estimated tau differences: {},\n' 
           'estimated imds: {}'.format(tau_differences, imd_means))
+

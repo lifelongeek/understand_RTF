@@ -2,7 +2,7 @@ clear all; clc; close all;
 
 %% case 1) #src = 1, #mic = 4, RT60 = 0
 
-load('stft/case1_mag_20ms.mat');
+load('../stft/case1_mag_20ms.mat');
 T = size(mag, 3);
 F = size(mag, 2);
 Flist = [1, ceil(F*0.25), ceil(F*0.5), ceil(F*0.75), F];
@@ -22,11 +22,11 @@ subplot(211); histogram(close_pmd); title('log(Mi/Mj) (close)', 'FontSize', 16);
 subplot(212); histogram(distant_pmd); title('log(Mi/Mj) (distant)', 'FontSize', 16);
 
 %% case 3) #src = 2, #mic = 4, RT60 = 0
-load('stft/case1_mag_20ms.mat');
+load('../stft/case1_mag_20ms.mat');
 mag_s1 = mag;
-load('stft/case3_s2_mag_20ms.mat');
+load('../stft/case3_s2_mag_20ms.mat');
 mag_s2 = mag;
-load('stft/case3_mix_mag_20ms.mat');
+load('../stft/case3_mix_mag_20ms.mat');
 mag_mix = mag;
 
 distant_pmd_s1 = squeeze(log(mag_s1(1, :, :)./(mag_s1(4, :, :)+1e-8)));

@@ -1,9 +1,9 @@
 function unwrapped = myunwrap(phaseMod, args)
 if nargin == 0
-    load('stft/case1_ppd_20ms_wrap_mod.mat', 'ppd_wrap_mod');
-    load('stft/case1_mag_20ms.mat', 'mag');
-    %load('stft/case3_mix_ppd_20ms_wrap_mod.mat', 'ppd_wrap_mod');
-    %load('stft/case3_mix_mag_20ms.mat', 'mag');
+    load('../stft/case1_ppd_20ms_wrap_mod.mat', 'ppd_wrap_mod');
+    load('../stft/case1_mag_20ms.mat', 'mag');
+    %load('../stft/case3_mix_ppd_20ms_wrap_mod.mat', 'ppd_wrap_mod');
+    %load('../stft/case3_mix_mag_20ms.mat', 'mag');
     args.time = ceil(size(ppd_wrap_mod, 3)*0.35);
     args.pair = [1 2];
     args.pairID = 1;
@@ -37,6 +37,19 @@ elseif strcmp(args.meth, 'replica')
     end
     unwrapped(f+1) = phaseMod(f+1)+2*pi*k;
     unwrapped(1,:) = unwrapped;
+
+elseif strcmp(args.meth, 'NoiseRobust')
+    unwrapped = zeros(size(phaseMod));
+    F = size(phaseMod, 2);
+    % from 'Noise robust linear dynamic system for phase unwrapping and
+    % smoothing'
+    tau = args.tau;
+    accum = 0;
+    for f=1:F
+        accum = accum + ((1-tau)^(f-1))*phaseMod(f);
+        unwrapped(f) = accum;
+    end
+    unwrapped = unwrapped * tau;
     
 elseif strcmp(args.meth, 'PhaseDenoise')
     phaseDenoised = lowpass(phaseMod(1,:,:), 4000, 16000);

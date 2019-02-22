@@ -1,0 +1,35 @@
+window: 20ms, method: "mean", avg error: 1.732ms
+window: 20ms, method: "distribution_maxima", top_percent: 1.0, avg_error: 2.856ms
+window: 20ms, method: "distribution_maxima", top_percent: 5.0, avg_error: 2.655ms
+window: 20ms, method: "distribution_maxima", top_percent: 10.0, avg_error: 2.545ms
+window: 20ms, method: "distribution_maxima", top_percent: 30.0, avg_error: 2.188ms
+window: 20ms, method: "distribution_maxima", top_percent: 50.0, avg_error: 2.184ms
+window: 20ms, method: "distribution_maxima", top_percent: 80.0, avg_error: 2.512ms
+window: 50ms, method: "mean", avg error: 2.265ms
+window: 50ms, method: "distribution_maxima", top_percent: 1.0, avg_error: 2.527ms
+window: 50ms, method: "distribution_maxima", top_percent: 5.0, avg_error: 2.514ms
+window: 50ms, method: "distribution_maxima", top_percent: 10.0, avg_error: 2.509ms
+window: 50ms, method: "distribution_maxima", top_percent: 30.0, avg_error: 2.423ms
+window: 50ms, method: "distribution_maxima", top_percent: 50.0, avg_error: 2.365ms
+window: 50ms, method: "distribution_maxima", top_percent: 80.0, avg_error: 2.479ms
+window: 100ms, method: "mean", avg error: 2.872ms
+window: 100ms, method: "distribution_maxima", top_percent: 1.0, avg_error: 2.962ms
+window: 100ms, method: "distribution_maxima", top_percent: 5.0, avg_error: 2.966ms
+window: 100ms, method: "distribution_maxima", top_percent: 10.0, avg_error: 2.951ms
+window: 100ms, method: "distribution_maxima", top_percent: 30.0, avg_error: 2.92ms
+window: 100ms, method: "distribution_maxima", top_percent: 50.0, avg_error: 2.932ms
+window: 100ms, method: "distribution_maxima", top_percent: 80.0, avg_error: 2.955ms
+window: 200ms, method: "mean", avg error: 3.206ms
+window: 200ms, method: "distribution_maxima", top_percent: 1.0, avg_error: 3.239ms
+window: 200ms, method: "distribution_maxima", top_percent: 5.0, avg_error: 3.24ms
+window: 200ms, method: "distribution_maxima", top_percent: 10.0, avg_error: 3.225ms
+window: 200ms, method: "distribution_maxima", top_percent: 30.0, avg_error: 3.223ms
+window: 200ms, method: "distribution_maxima", top_percent: 50.0, avg_error: 3.229ms
+window: 200ms, method: "distribution_maxima", top_percent: 80.0, avg_error: 3.241ms
+window: 400ms, method: "mean", avg error: 3.373ms
+window: 400ms, method: "distribution_maxima", top_percent: 1.0, avg_error: 3.396ms
+window: 400ms, method: "distribution_maxima", top_percent: 5.0, avg_error: 3.383ms
+window: 400ms, method: "distribution_maxima", top_percent: 10.0, avg_error: 3.375ms
+window: 400ms, method: "distribution_maxima", top_percent: 30.0, avg_error: 3.377ms
+window: 400ms, method: "distribution_maxima", top_percent: 50.0, avg_error: 3.379ms
+window: 400ms, method: "distribution_maxima", top_percent: 80.0, avg_error: 3.385ms

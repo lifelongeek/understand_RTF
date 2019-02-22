@@ -2,11 +2,13 @@ import librosa, torch, numpy as np, os, scipy.io as sio
 # import numpy as np
 
 fs = 16000
-def singleSrcSTFT(m1_path, m2_path):
+def singleSrcSTFT(m1_path, m2_path, win_duration=20):
+    # win_duration is in [ms]
+
     m1, _ = librosa.load(m1_path, sr=fs)
     m2, _ = librosa.load(m2_path, sr=fs)
 
-    nFFT = 320  # 20ms
+    nFFT = fs//1000*win_duration  # win_duration==20 -> nFFT==320
     win_size = nFFT
     shift = int(win_size / 2)
     win_type = 'hamming'
@@ -19,12 +21,12 @@ def singleSrcSTFT(m1_path, m2_path):
     stft_1_phs = torch.FloatTensor(np.angle(stft_1))
     stft_2_phs = torch.FloatTensor(np.angle(stft_2))
 
-    mag_multi_20ms = torch.cat((stft_1_mag.unsqueeze(0), stft_2_mag.unsqueeze(0)), dim=0)
-    phs_multi_20ms = torch.cat((stft_1_phs.unsqueeze(0), stft_2_phs.unsqueeze(0)), dim=0)
+    mag_multi = torch.cat((stft_1_mag.unsqueeze(0), stft_2_mag.unsqueeze(0)), dim=0)
+    phs_multi = torch.cat((stft_1_phs.unsqueeze(0), stft_2_phs.unsqueeze(0)), dim=0)
 
     id = os.path.split(m1_path)[-1][:-7]
-    sio.savemat('stft/{}_mag_20ms.mat'.format(id), {'mag': mag_multi_20ms.numpy()})
-    sio.savemat('stft/{}_phs_20ms.mat'.format(id), {'phs': phs_multi_20ms.numpy()})
+    sio.savemat('stft/{}_mag_{}ms.mat'.format(id, win_duration), {'mag': mag_multi.numpy()})
+    sio.savemat('stft/{}_phs_{}ms.mat'.format(id, win_duration), {'phs': phs_multi.numpy()})
 
 
 if __name__ == '__main__':
@@ -35,4 +37,4 @@ if __name__ == '__main__':
             mix_id = filename[:-4]
             m1_path = os.path.join(mic_dir, '{}_m1.wav'.format(mix_id))
             m2_path = os.path.join(mic_dir, '{}_m2.wav'.format(mix_id))
-            singleSrcSTFT(m1_path, m2_path)
+            singleSrcSTFT(m1_path, m2_path, 50)

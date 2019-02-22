@@ -66,8 +66,8 @@ zlabel('Z', 'FontSize', 14);
 hold off;
 
 % Read audio
-[x1, fs] = audioread('237-134493-0002.wav');
-[x2, fs] = audioread('1320-122617-0001.wav');
+[x1, fs] = audioread('../audio/237-134493-0002.wav');
+[x2, fs] = audioread('../audio/1320-122617-0001.wav');
 
 c = 340;
 nSample = 6400;
@@ -93,10 +93,10 @@ y12 = fftfilt(h12, x1);
 y13 = fftfilt(h13, x1);
 y14 = fftfilt(h14, x1);
 
-audiowrite('audio/case1_y11.wav', y11, fs);
-audiowrite('audio/case1_y12.wav', y12, fs);
-audiowrite('audio/case1_y13.wav', y13, fs);
-audiowrite('audio/case1_y14.wav', y14, fs);
+audiowrite('../audio/case1_y11.wav', y11, fs);
+audiowrite('../audio/case1_y12.wav', y12, fs);
+audiowrite('../audio/case1_y13.wav', y13, fs);
+audiowrite('../audio/case1_y14.wav', y14, fs);
 
 figure(52);
 subplot(421); plot(h11(1:200), 'LineWidth', 1.5); title('h11', 'FontSize', 14);
@@ -135,20 +135,20 @@ y22 = fftfilt(h22, x2);
 y23 = fftfilt(h23, x2);
 y24 = fftfilt(h24, x2);
 
-audiowrite('audio/case3_y21.wav', y21, fs);
-audiowrite('audio/case3_y22.wav', y22, fs);
-audiowrite('audio/case3_y23.wav', y23, fs);
-audiowrite('audio/case3_y24.wav', y24, fs);
+audiowrite('../audio/case3_y21.wav', y21, fs);
+audiowrite('../audio/case3_y22.wav', y22, fs);
+audiowrite('../audio/case3_y23.wav', y23, fs);
+audiowrite('../audio/case3_y24.wav', y24, fs);
 
 y1 = y11(1:min(length(y11), length(y21))) + y21(1:min(length(y11), length(y21)));
 y2 = y12(1:min(length(y12), length(y22))) + y22(1:min(length(y12), length(y22)));
 y3 = y13(1:min(length(y13), length(y23))) + y23(1:min(length(y13), length(y23)));
 y4 = y14(1:min(length(y14), length(y24))) + y24(1:min(length(y14), length(y24)));
 
-audiowrite('audio/case3_y1.wav', y1, fs);
-audiowrite('audio/case3_y2.wav', y2, fs);
-audiowrite('audio/case3_y3.wav', y3, fs);
-audiowrite('audio/case3_y4.wav', y4, fs);
+audiowrite('../audio/case3_y1.wav', y1, fs);
+audiowrite('../audio/case3_y2.wav', y2, fs);
+audiowrite('../audio/case3_y3.wav', y3, fs);
+audiowrite('../audio/case3_y4.wav', y4, fs);
 
 
 

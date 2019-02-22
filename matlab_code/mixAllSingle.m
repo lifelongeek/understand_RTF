@@ -1,6 +1,7 @@
-source_dir = 'audio/source';
-mic_dir = 'audio/mic';
-h_dir = 'H';
+rng(0);
+source_dir = '../audio/source';
+mic_dir = '../audio/mic';
+h_dir = '../H';
 
 src_files = dir(fullfile(source_dir,'*.wav'));
 for f = src_files'

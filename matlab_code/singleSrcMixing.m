@@ -1,8 +1,8 @@
 function singleSrcMixing(src_path, mic_dir, h_dir)
 if nargin==0
-    src_path = 'audio/source/84-121123-0000.wav';
-    mic_dir = 'audio/mic';
-    h_dir = 'H';
+    src_path = '../audio/source/84-121123-0000.wav';
+    mic_dir = '../audio/mic';
+    h_dir = '../H';
 end
 [~, src_fname, ~] = fileparts(src_path);
 [status, msg] = mkdir(mic_dir); % status and msg are needed for not seeing warnings if folder already exists
@@ -52,6 +52,6 @@ save(fullfile(h_dir, sprintf('%s.mat', src_fname)), 'h11', 'h12');
 m11 = fftfilt(h11, s1);
 m12 = fftfilt(h12, s1);
 
-audiowrite(fullfile(mic_dir, sprintf('%s_m11.wav', src_fname)), m11, fs);
-audiowrite(fullfile(mic_dir, sprintf('%s_m12.wav', src_fname)), m12, fs);
+audiowrite(fullfile(mic_dir, sprintf('%s_m1.wav', src_fname)), m11, fs);
+audiowrite(fullfile(mic_dir, sprintf('%s_m2.wav', src_fname)), m12, fs);
 end
