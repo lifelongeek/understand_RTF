@@ -10,7 +10,7 @@ testAllSingleSrcTwoMic.py - tests all estimates against all truths
 ## Run order:
 1. mixAllSingle.m
     
-2. stftAllSingle.py
+2. stftAllSingle.py  
     window duration(in ms) can be specified in the last line:  
     
         singleSrcSTFT(m1_path, m2_path, WINDOW_DURATION)
@@ -19,7 +19,7 @@ testAllSingleSrcTwoMic.py - tests all estimates against all truths
 
 
 ## test script
-there is a test.sh which runs testAllSingleSrcTwoMic.py with different arguments  
+there is a test.sh which runs testAllSingleSrcTwoMic.py with different arguments;  
 following will do the job in bash:
 
     ./test.sh
